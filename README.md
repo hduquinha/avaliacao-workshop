@@ -35,8 +35,11 @@ Para cruzar avaliação com lead, use o telefone: o payload guarda
 | Variável | Obrigatória | Para quê |
 |---|---|---|
 | `DATABASE_URL` | **sim** | Postgres onde a tabela vive (o mesmo dos outros formulários) |
-| `PG_SSL` / `PGSSLMODE` | não | `disable` para conexão sem TLS; sem isso o padrão é TLS sem verificação de CA |
+| `PG_SSL` | **na prática, sim** | `disable`. O Postgres do projeto (`postgres:16-alpine`) sobe **sem TLS**: sem isso o driver tenta SSL, o servidor recusa e nada é gravado. Alternativa equivalente: `?sslmode=disable` no fim da `DATABASE_URL` |
 | `ALLOWED_ORIGINS` | não | Origens extras autorizadas a chamar a API (a do próprio domínio já é aceita) |
+
+Se algo der errado, a API responde **dizendo o que arrumar** (TLS, senha recusada,
+banco inexistente) junto com o código do Postgres — não existe 500 mudo aqui.
 
 A tabela é criada sozinha no primeiro envio (`CREATE TABLE IF NOT EXISTS`).
 
