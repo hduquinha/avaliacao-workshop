@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Microsoft Clarity (mapa de calor/gravacoes) — ver clarity.js na raiz -->
+  <script defer src="/clarity.js"></script>
+
+  <title>Avaliação do Workshop · VozUP</title>
+  <meta name="description" content="Conte como foi sua experiência no Workshop de Oratória da VozUP. Três perguntas, menos de um minuto." />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#04191b" />
+
+  <link rel="icon" type="image/jpeg" href="/img/vozup-logo.jpeg" />
+  <link rel="apple-touch-icon" href="/img/vozup-logo.jpeg" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Avaliação do Workshop · VozUP" />
+  <meta property="og:description" content="Três perguntas rápidas sobre a sua experiência no workshop." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Paleta da VozUP — a mesma das paginas de workshop em aula-experimental/ */
+    :root{
+      --primary:#018E95;
+      --primary-dark:#007881;
+      --primary-light:#6AC1C1;
+      --primary-rgb:1,142,149;
+      --text:#ffffff;
+      --muted:#b9d4d6;
+      --card:#0b1618;
+      --card-border:#183034;
+      --danger:#ff6b6b;
+      --ok:#5ee6a8;
+    }
+    *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+    html{font-size:18px}
+    @media (max-width:900px){ html{font-size:17px} }
+    @media (max-width:600px){ html{font-size:16px} }
+    body{
+      margin:0; min-height:100%;
+      font-family:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:linear-gradient(160deg,#000000,#04191b 55%,#062629);
+      line-height:1.5;
+    }
+    .container{max-width:640px; margin:0 auto; padding:28px 20px 56px}
+
+    .brand{display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; padding:12px 0 26px}
+    .logo-wrap{position:relative; width:86px; height:86px}
+    .logo-ring{position:absolute; inset:0; border-radius:50%; background:conic-gradient(var(--primary-light),var(--primary),var(--primary-light))}
+    .logo-img{position:absolute; inset:4px; width:calc(100% - 8px); height:calc(100% - 8px); border-radius:50%; object-fit:cover; border:2px solid #04191b}
+    h1{margin:0; font-size:clamp(1.7rem,4.6vw,2.3rem); line-height:1.15; letter-spacing:-.4px}
+    h1 .t-accent{color:var(--primary-light)}
+    .subtitle{margin:0; color:var(--muted); font-size:.95rem; max-width:32rem}
+    .event-badge{
+      font-size:.7rem; letter-spacing:.7px; font-weight:700; text-transform:uppercase;
+      color:var(--primary-light); background:rgba(var(--primary-rgb),.12);
+      border:1px solid #1d4a4e; border-radius:40px; padding:8px 16px;
+    }
+
+    .card{
+      background:var(--card); border:1px solid var(--card-border); border-radius:22px;
+      padding:26px 24px 30px; position:relative; overflow:hidden;
+      box-shadow:0 10px 44px -10px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.03);
+    }
+    .card:before{content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at 88% 8%,rgba(var(--primary-rgb),.22),transparent 58%)}
+
+    .form-header{display:flex; gap:10px; justify-content:center; margin:0 0 8px}
+    .dot{width:32px; height:32px; border-radius:50%; background:#0e1c1e; color:#7fa6aa; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.82rem; border:2px solid #1e3a3d; transition:.25s}
+    .dot.active{background:var(--primary); color:#00232a; border-color:var(--primary); box-shadow:0 0 0 4px rgba(var(--primary-rgb),.3)}
+    .dot.done{background:var(--primary-dark); color:#d5f7fa; border-color:var(--primary-dark); opacity:.85}
+    .progress-text{text-align:center; font-size:.75rem; letter-spacing:.6px; color:#7fa6aa; margin:0 0 18px}
+
+    .form-step{display:none}
+    .form-step.active{display:block}
+    .question{margin:0 0 4px; font-size:1.12rem; font-weight:700; line-height:1.3}
+    .question-help{margin:0 0 16px; font-size:.78rem; color:#8fb8bc; letter-spacing:.3px}
+
+    .field{display:flex; flex-direction:column; gap:8px; margin-bottom:18px}
+    .field label{font-size:.95rem; font-weight:600; letter-spacing:.3px}
+    .field input{background:#071214; color:var(--text); border:2px solid #1a3033; border-radius:14px; padding:15px 16px; font-size:1rem; font-weight:500; outline:none; transition:.25s}
+    .field input:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(var(--primary-rgb),.45)}
+    .field input::placeholder{color:#63807f; font-weight:400}
+
+    /* Escala de 0 a 10 */
+    .scale{display:grid; grid-template-columns:repeat(11,1fr); gap:6px; margin:4px 0 10px}
+    @media (max-width:560px){ .scale{grid-template-columns:repeat(6,1fr); gap:8px} }
+    .scale-item{margin:0; cursor:pointer}
+    .scale-item input{position:absolute; opacity:0; width:0; height:0}
+    .scale-item span{
+      display:flex; align-items:center; justify-content:center; height:46px;
+      background:#0c1a1c; border:2px solid #1c3538; border-radius:12px;
+      font-weight:700; font-size:.95rem; color:#a9c9cb; transition:.18s;
+    }
+    .scale-item:hover span{border-color:#2b5d61; color:#fff}
+    .scale-item input:focus-visible + span{box-shadow:0 0 0 3px rgba(var(--primary-rgb),.55)}
+    .scale-item.is-checked span{background:var(--primary); border-color:var(--primary); color:#00232a; box-shadow:0 4px 16px -6px rgba(var(--primary-rgb),.8)}
+    .scale-legend{display:flex; justify-content:space-between; font-size:.7rem; color:#8fb8bc; letter-spacing:.3px; margin-bottom:6px}
+
+    /* Opcoes em cartao (perguntas 2 e 3) */
+    .options{display:grid; gap:10px; margin:0 0 6px}
+    .option{display:flex; align-items:center; gap:12px; margin:0; padding:15px 16px; cursor:pointer; background:#0c1a1c; border:2px solid #1c3538; border-radius:16px; transition:.18s; font-size:.95rem; font-weight:600; line-height:1.3}
+    .option:hover{border-color:#2b5d61; background:#0f2124}
+    .option input{width:20px; height:20px; flex:0 0 auto; accent-color:var(--primary); cursor:pointer}
+    .option.is-checked{border-color:var(--primary); background:rgba(var(--primary-rgb),.12); box-shadow:0 0 0 1px rgba(var(--primary-rgb),.35)}
+
+    .error{color:var(--danger); font-size:.78rem; min-height:20px; letter-spacing:.3px}
+    .actions{display:flex; justify-content:space-between; gap:12px; margin-top:10px}
+    .btn{appearance:none; border:2px solid #1e4247; background:#0e2225; color:var(--text); padding:14px 22px; border-radius:14px; cursor:pointer; font-weight:700; letter-spacing:.5px; font-size:.95rem; transition:.22s}
+    .btn:hover{background:#143034; border-color:#2b5d61}
+    .btn:focus-visible{outline:none; box-shadow:0 0 0 4px rgba(var(--primary-rgb),.5)}
+    .btn-primary{background:var(--primary); border-color:var(--primary); color:#00232a}
+    .btn-primary:hover{background:var(--primary-light); border-color:var(--primary-light); color:#00232a}
+    .btn[disabled]{opacity:.6; cursor:default}
+    .status{min-height:18px; margin:0 0 8px; font-size:.8rem; letter-spacing:.3px; color:#8fb8bc; text-align:center}
+
+    .success{text-align:center; padding:12px 4px 4px}
+    .success-icon{font-size:2.4rem; line-height:1}
+    .success h2{margin:12px 0 10px; font-size:1.35rem; color:var(--primary-light); letter-spacing:.3px}
+    .success p{margin:0 0 18px; font-size:.95rem; color:var(--muted)}
+    .btn-whats{display:none; text-decoration:none; background:#25D366; border-color:#25D366; color:#062b17; padding:15px 22px; border-radius:14px; font-weight:800; letter-spacing:.4px}
+    .btn-whats:hover{background:#3ae07a; border-color:#3ae07a}
+
+    footer{color:#6e8f92; font-size:.7rem; text-align:center; padding:24px 0 0; letter-spacing:.5px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="brand">
+      <div class="logo-wrap" aria-hidden="true">
+        <div class="logo-ring"></div>
+        <img class="logo-img" src="/img/vozup-logo.jpeg" alt="" />
+      </div>
+      <h1>Como foi o seu <span class="t-accent">workshop</span>?</h1>
+      <p class="subtitle">Três perguntas rápidas. Sua resposta ajuda a gente a melhorar a experiência das próximas turmas.</p>
+      <div class="event-badge" id="eventBadge">Workshop VozUP</div>
+    </header>
+
+    <main class="card" id="formCard">
+      <div class="status" id="sendStatus" role="status" aria-live="polite"></div>
+
+      <div class="form-header" id="progressDots" aria-label="Progresso da avaliação">
+        <div class="dot" data-step="0">1</div>
+        <div class="dot" data-step="1">2</div>
+        <div class="dot" data-step="2">3</div>
+        <div class="dot" data-step="3">4</div>
+      </div>
+      <p class="progress-text" id="progressText">Etapa 1 de 4</p>
+
+      <div class="success" id="formSuccess" hidden>
+        <div class="success-icon" aria-hidden="true">✅</div>
+        <h2>Obrigado pela sua avaliação!</h2>
+        <p id="successMessage">Sua resposta foi registrada. Boa jornada com a sua comunicação!</p>
+        <a class="btn btn-whats" id="successWhatsApp" href="#" target="_blank" rel="noopener noreferrer">Falar com a equipe no WhatsApp</a>
+      </div>
+
+      <form id="msForm" novalidate>
+        <!-- Etapa 1: quem esta respondendo -->
+        <div class="form-step active" data-step="0">
+          <p class="question">Antes de começar, quem está respondendo?</p>
+          <p class="question-help">Usamos seu contato apenas para dar continuidade, se você quiser.</p>
+          <div class="field">
+            <label for="nome">Nome completo</label>
+            <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Seu nome completo" required />
+            <div class="error" data-for="nome"></div>
+          </div>
+          <div class="field">
+            <label for="telefone">WhatsApp</label>
+            <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" required />
+            <div class="error" data-for="telefone"></div>
+          </div>
+          <div class="actions">
+            <span></span>
+            <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+          </div>
+        </div>
+
+        <!-- Etapa 2: nota de 0 a 10 -->
+        <div class="form-step" data-step="1">
+          <p class="question" id="notaLabel">De 0 a 10, quanto este workshop contribuiu para você perceber algo que precisa desenvolver na sua comunicação?</p>
+          <p class="question-help">0 = não contribuiu &nbsp;|&nbsp; 10 = contribuiu muito</p>
+          <div class="scale" role="group" aria-labelledby="notaLabel" id="notaScale">
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="0" /><span>0</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="1" /><span>1</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="2" /><span>2</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="3" /><span>3</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="4" /><span>4</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="5" /><span>5</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="6" /><span>6</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="7" /><span>7</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="8" /><span>8</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="9" /><span>9</span></label>
+            <label class="scale-item"><input type="radio" name="nota_contribuicao" value="10" /><span>10</span></label>
+          </div>
+          <div class="scale-legend"><span>Não contribuiu</span><span>Contribuiu muito</span></div>
+          <div class="error" data-for="nota_contribuicao"></div>
+          <div class="actions">
+            <button type="button" class="btn" data-back>VOLTAR</button>
+            <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+          </div>
+        </div>
+
+        <!-- Etapa 3: momento mais marcante -->
+        <div class="form-step" data-step="2">
+          <p class="question">Qual momento do workshop mais contribuiu para a sua experiência?</p>
+          <p class="question-help">Escolha uma opção.</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="momento_marcante" value="Storytelling" /> Storytelling</label>
+            <label class="option"><input type="radio" name="momento_marcante" value="Dinâmica: apresentar e “vender” o colega" /> Dinâmica: apresentar e “vender” o colega</label>
+            <label class="option"><input type="radio" name="momento_marcante" value="Dinâmica: “Quem sou eu?”" /> Dinâmica: “Quem sou eu?”</label>
+            <label class="option"><input type="radio" name="momento_marcante" value="Visualização de futuro" /> Visualização de futuro</label>
+            <label class="option"><input type="radio" name="momento_marcante" value="O conjunto da experiência" /> O conjunto da experiência</label>
+          </div>
+          <div class="error" data-for="momento_marcante"></div>
+          <div class="actions">
+            <button type="button" class="btn" data-back>VOLTAR</button>
+            <button type="button" class="btn btn-primary" data-next>PRÓXIMO</button>
+          </div>
+        </div>
+
+        <!-- Etapa 4: interesse em continuar -->
+        <div class="form-step" data-step="3">
+          <p class="question">Depois da experiência de hoje, qual é o seu nível de interesse em continuar desenvolvendo sua comunicação com a VozUP?</p>
+          <p class="question-help">Escolha uma opção.</p>
+          <div class="options">
+            <label class="option"><input type="radio" name="interesse_continuar" value="Quero entender os próximos passos" /> Quero entender os próximos passos</label>
+            <label class="option"><input type="radio" name="interesse_continuar" value="Tenho interesse, mas preciso avaliar" /> Tenho interesse, mas preciso avaliar</label>
+            <label class="option"><input type="radio" name="interesse_continuar" value="Gostei da experiência, mas não é prioridade agora" /> Gostei da experiência, mas não é prioridade agora</label>
+            <label class="option"><input type="radio" name="interesse_continuar" value="Não tenho interesse em continuar neste momento" /> Não tenho interesse em continuar neste momento</label>
+          </div>
+          <div class="error" data-for="interesse_continuar"></div>
+          <div class="actions">
+            <button type="button" class="btn" data-back>VOLTAR</button>
+            <button type="submit" class="btn btn-primary">ENVIAR AVALIAÇÃO</button>
+          </div>
+        </div>
+      </form>
+    </main>
+
+    <footer>VozUP · Escola de Oratória e Comunicação</footer>
+  </div>
+
+  <script>
+    // =================================================================
+    // Qual workshop esta sendo avaliado.
+    // Fonte da verdade: a constante abaixo (mesma convencao de rotulo das
+    // paginas de workshop — "Workshop DD/MM/AAAA"). Para reaproveitar o
+    // mesmo link em outra data sem novo deploy, passe ?data=2026-09-24 ou
+    // ?data=24/09/2026 na URL.
+    // =================================================================
+    const WORKSHOP_CONFIG = { dateISO: '2026-09-17' };
+
+    const API_ENDPOINT = '/api/avaliacao';
+    const WHATSAPP_NUMBER = '551120901412';
+
+    const workshop = (function resolveWorkshop(){
+      const param = new URLSearchParams(location.search).get('data') || '';
+      const iso = /^\d{4}-\d{2}-\d{2}$/.test(param.trim())
+        ? param.trim()
+        : (/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(param.trim())
+            ? param.trim().replace(/^(\d{2})\/(\d{2})\/(\d{4})$/, '$3-$2-$1')
+            : WORKSHOP_CONFIG.dateISO);
+      const [ano, mes, dia] = iso.split('-');
+      return { dateISO: iso, dateDisplay: `${dia}/${mes}/${ano}`, rotulo: `Workshop ${dia}/${mes}/${ano}` };
+    })();
+
+    document.getElementById('eventBadge').textContent = `Workshop de ${workshop.dateDisplay}`;
+
+    const form = document.getElementById('msForm');
+    const steps = Array.from(document.querySelectorAll('.form-step'));
+    const dots = Array.from(document.querySelectorAll('#progressDots .dot'));
+    const progressText = document.getElementById('progressText');
+    const progressDots = document.getElementById('progressDots');
+    const successBlock = document.getElementById('formSuccess');
+    const statusEl = document.getElementById('sendStatus');
+    const respostas = {};
+    let current = 0;
+    let isSubmitting = false;
+
+    progressText.textContent = `Etapa 1 de ${steps.length}`;
+
+    // Identificador da aba: o servidor usa para nao gravar duas vezes a
+    // mesma avaliacao se o envio for repetido (F5, clique duplo, rede lenta).
+    const clientId = (function(){
+      const novo = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+      try{
+        const guardado = sessionStorage.getItem('avaliacao:clientId');
+        if(guardado) return guardado;
+        const id = novo();
+        sessionStorage.setItem('avaliacao:clientId', id);
+        return id;
+      }catch{
+        return novo();
+      }
+    })();
+
+    // Mascara de telefone (mesmo formato dos outros formularios do grupo)
+    document.getElementById('telefone').addEventListener('input', (event)=>{
+      const digits = event.target.value.replace(/\D+/g,'').slice(0,11);
+      let out = digits;
+      if(digits.length > 10) out = `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7)}`;
+      else if(digits.length > 6) out = `(${digits.slice(0,2)}) ${digits.slice(2,6)}-${digits.slice(6)}`;
+      else if(digits.length > 2) out = `(${digits.slice(0,2)}) ${digits.slice(2)}`;
+      else if(digits.length > 0) out = '(' + digits;
+      event.target.value = out;
+    });
+
+    // Marca visualmente a opcao escolhida. Feito em JS (e nao com :has no
+    // CSS) para a selecao aparecer tambem em navegador antigo de celular.
+    form.addEventListener('change', (event)=>{
+      const input = event.target;
+      if(input.type !== 'radio') return;
+      form.querySelectorAll(`input[name="${input.name}"]`).forEach((radio)=>{
+        const box = radio.closest('.scale-item, .option');
+        if(box) box.classList.toggle('is-checked', radio.checked);
+      });
+    });
+
+    function setStatus(msg, type){
+      const cores = { info:'#8fb8bc', ok:'var(--ok)', err:'var(--danger)' };
+      statusEl.style.color = cores[type] || cores.info;
+      statusEl.textContent = msg || '';
+    }
+
+    function showStep(n){
+      current = Math.max(0, Math.min(steps.length - 1, n));
+      steps.forEach((el, idx)=> el.classList.toggle('active', idx === current));
+      dots.forEach((dot, idx)=>{
+        dot.classList.remove('active','done');
+        if(idx < current) dot.classList.add('done');
+        if(idx === current) dot.classList.add('active');
+      });
+      progressText.textContent = `Etapa ${current + 1} de ${steps.length}`;
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    function setError(section, name, msg){
+      const el = section.querySelector(`.error[data-for="${name}"]`);
+      if(el) el.textContent = msg;
+    }
+
+    function validateCurrent(){
+      const section = steps[current];
+      section.querySelectorAll('.error').forEach((el)=> el.textContent = '');
+      let valid = true;
+
+      section.querySelectorAll('input[type="text"], input[type="tel"]').forEach((input)=>{
+        const valor = input.value.trim();
+        if(!valor){
+          setError(section, input.name, 'Campo obrigatório');
+          valid = false;
+          return;
+        }
+        if(input.name === 'nome' && valor.split(/\s+/).filter(Boolean).length < 2){
+          setError(section, 'nome', 'Por favor, coloque seu nome completo');
+          valid = false;
+        }
+        if(input.type === 'tel'){
+          const digits = valor.replace(/\D+/g,'');
+          if(digits.length < 10 || digits.length > 11){
+            setError(section, 'telefone', 'Telefone deve ter 10 ou 11 dígitos');
+            valid = false;
+          } else if(digits.length === 11 && digits[2] !== '9'){
+            setError(section, 'telefone', 'Celular deve começar com 9 após o DDD');
+            valid = false;
+          }
+        }
+      });
+
+      const grupos = new Set(Array.from(section.querySelectorAll('input[type="radio"]')).map((r)=> r.name));
+      grupos.forEach((name)=>{
+        if(!section.querySelector(`input[name="${name}"]:checked`)){
+          setError(section, name, 'Selecione uma opção');
+          valid = false;
+        }
+      });
+
+      return valid;
+    }
+
+    function collectCurrent(){
+      steps[current].querySelectorAll('input').forEach((input)=>{
+        if(input.type === 'radio'){
+          if(input.checked) respostas[input.name] = input.value;
+        } else if(input.value.trim()){
+          respostas[input.name] = input.value.trim();
+        }
+      });
+    }
+
+    form.addEventListener('click', (event)=>{
+      const next = event.target.closest('[data-next]');
+      if(next){
+        if(!validateCurrent()) return;
+        collectCurrent();
+        setStatus('');
+        showStep(current + 1);
+        return;
+      }
+      if(event.target.closest('[data-back]')) showStep(current - 1);
+    });
+
+    function enterSuccessState(){
+      progressDots.hidden = true;
+      progressText.hidden = true;
+      form.hidden = true;
+
+      // Quem respondeu "quero entender os proximos passos" sai da pesquisa
+      // com o caminho aberto; para as outras respostas o botao nao aparece.
+      if(respostas.interesse_continuar === 'Quero entender os próximos passos'){
+        const link = document.getElementById('successWhatsApp');
+        const mensagem = `Olá! Sou ${respostas.nome} e participei do ${workshop.rotulo}. Quero entender os próximos passos com a VozUP.`;
+        link.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensagem)}`;
+        link.style.display = 'inline-block';
+        document.getElementById('successMessage').textContent = 'Sua resposta foi registrada. Fale com a nossa equipe para ver os próximos passos.';
+      }
+
+      successBlock.hidden = false;
+      setStatus('Avaliação enviada. Obrigado!', 'ok');
+    }
+
+    form.addEventListener('submit', async (event)=>{
+      event.preventDefault();
+      if(isSubmitting) return;
+      if(!validateCurrent()) return;
+      collectCurrent();
+
+      const botao = form.querySelector('button[type="submit"]');
+      isSubmitting = true;
+      botao.disabled = true;
+      botao.textContent = 'ENVIANDO...';
+      setStatus('Enviando sua avaliação...', 'info');
+
+      try{
+        const resposta = await fetch(API_ENDPOINT, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            ...respostas,
+            workshop_rotulo: workshop.rotulo,
+            workshop_data: workshop.dateISO,
+            clientId,
+            page: location.href,
+          }),
+        });
+        const corpo = await resposta.json().catch(()=> null);
+
+        if(!resposta.ok || !corpo || corpo.ok !== true){
+          setStatus((corpo && corpo.error) || `Não foi possível enviar (${resposta.status}). Tente de novo.`, 'err');
+          isSubmitting = false;
+          botao.disabled = false;
+          botao.textContent = 'ENVIAR AVALIAÇÃO';
+          return;
+        }
+
+        enterSuccessState();
+      }catch(err){
+        console.warn('Falha ao enviar avaliacao:', err);
+        setStatus('Erro de conexão. Verifique a internet e tente de novo.', 'err');
+        isSubmitting = false;
+        botao.disabled = false;
+        botao.textContent = 'ENVIAR AVALIAÇÃO';
+      }
+    });
+  </script>
+</body>
+</html>
