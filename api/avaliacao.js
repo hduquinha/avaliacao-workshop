@@ -329,10 +329,36 @@ async function findExisting(pg, registro) {
   return porTelefone.rowCount ? porTelefone.rows[0].id : 0;
 }
 
-function isDatabaseConfigurationError(err) {
-  if (!err) return false;
-  if (DATABASE_CONNECTIVITY_ERROR_CODES.has(err.code)) return true;
-  return String(err.message || '').includes('DATABASE_URL');
+// Erro de banco vira resposta que DIZ o que arrumar. Um 500 mudo aqui custa
+// uma sessao inteira de adivinhacao entre senha errada, banco errado e TLS —
+// os tres falham igual para quem so ve a tela. O codigo do Postgres
+// (`28P01`, `3D000`, `ECONNREFUSED`...) vai junto: ele nao carrega credencial
+// nenhuma e e o que resolve a duvida em um olhar.
+function getDiagnostico(err) {
+  const mensagem = String(err?.message || '');
+
+  // A imagem postgres:16-alpine sobe SEM TLS. Sem `sslmode=disable` na
+  // DATABASE_URL (ou PG_SSL=disable), o driver tenta SSL e o servidor recusa.
+  if (/does not support SSL/i.test(mensagem)) {
+    return {
+      status: 503,
+      error: 'O Postgres nao aceita TLS: acrescente PG_SSL=disable nas variaveis da Vercel (ou ?sslmode=disable na DATABASE_URL).',
+    };
+  }
+
+  if (DATABASE_CONNECTIVITY_ERROR_CODES.has(err?.code) || mensagem.includes('DATABASE_URL')) {
+    return { status: 503, error: 'Banco de dados indisponivel. Verifique a DATABASE_URL na Vercel.' };
+  }
+
+  if (err?.code === '28P01') {
+    return { status: 503, error: 'Usuario ou senha recusados pelo Postgres. Confira a DATABASE_URL na Vercel.' };
+  }
+
+  if (err?.code === '3D000') {
+    return { status: 503, error: 'O banco informado na DATABASE_URL nao existe.' };
+  }
+
+  return { status: 500, error: 'Nao foi possivel salvar sua avaliacao.' };
 }
 
 async function handler(req, res) {
@@ -387,15 +413,12 @@ async function handler(req, res) {
   } catch (err) {
     console.error('Erro ao salvar avaliacao do workshop:', err);
 
-    if (isDatabaseConfigurationError(err)) {
-      res.status(503).json({
-        ok: false,
-        error: 'Banco de dados indisponivel. Verifique a DATABASE_URL na Vercel.',
-      });
-      return;
-    }
-
-    res.status(500).json({ ok: false, error: 'Nao foi possivel salvar sua avaliacao.' });
+    const diagnostico = getDiagnostico(err);
+    res.status(diagnostico.status).json({
+      ok: false,
+      error: diagnostico.error,
+      codigo: safeString(err?.code, 16) || undefined,
+    });
   }
 }
 
