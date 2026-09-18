@@ -209,7 +209,7 @@
           <p class="question">Qual momento do workshop mais contribuiu para a sua experiência?</p>
           <p class="question-help">Escolha uma opção.</p>
           <div class="options">
-            <label class="option"><input type="radio" name="momento_marcante" value="Storytelling" /> Storytelling</label>
+            <label class="option"><input type="radio" name="momento_marcante" value="Storytelling (a forma estratégica para gerar conexão)" /> Storytelling (a forma estratégica para gerar conexão)</label>
             <label class="option"><input type="radio" name="momento_marcante" value="Dinâmica: apresentar e “vender” o colega" /> Dinâmica: apresentar e “vender” o colega</label>
             <label class="option"><input type="radio" name="momento_marcante" value="Dinâmica: “Quem sou eu?”" /> Dinâmica: “Quem sou eu?”</label>
             <label class="option"><input type="radio" name="momento_marcante" value="Visualização de futuro" /> Visualização de futuro</label>
@@ -224,12 +224,12 @@
 
         <!-- Etapa 4: interesse em continuar -->
         <div class="form-step" data-step="3">
-          <p class="question">Depois da experiência de hoje, qual é o seu nível de interesse em continuar desenvolvendo sua comunicação com a VozUP?</p>
+          <p class="question">Qual será seu próximo passo com a VozUP?</p>
           <p class="question-help">Escolha uma opção.</p>
           <div class="options">
-            <label class="option"><input type="radio" name="interesse_continuar" value="Quero entender os próximos passos" /> Quero entender os próximos passos</label>
-            <label class="option"><input type="radio" name="interesse_continuar" value="Tenho interesse, mas preciso avaliar" /> Tenho interesse, mas preciso avaliar</label>
-            <label class="option"><input type="radio" name="interesse_continuar" value="Gostei da experiência, mas não é prioridade agora" /> Gostei da experiência, mas não é prioridade agora</label>
+            <label class="option"><input type="radio" name="interesse_continuar" value="Quero agendar minha consultoria individual para conhecer a grade de cursos" /> Quero agendar minha consultoria individual para conhecer a grade de cursos</label>
+            <label class="option"><input type="radio" name="interesse_continuar" value="Quero continuar desenvolvendo minha comunicação e entender o plano ideal para mim" /> Quero continuar desenvolvendo minha comunicação e entender o plano ideal para mim</label>
+            <label class="option"><input type="radio" name="interesse_continuar" value="Gostei da experiência e quero que entrem em contato para me explicar as opções" /> Gostei da experiência e quero que entrem em contato para me explicar as opções</label>
             <label class="option"><input type="radio" name="interesse_continuar" value="Não tenho interesse em continuar neste momento" /> Não tenho interesse em continuar neste momento</label>
           </div>
           <div class="error" data-for="interesse_continuar"></div>
@@ -256,6 +256,7 @@
 
     const API_ENDPOINT = '/api/avaliacao';
     const WHATSAPP_NUMBER = '551120901412';
+    const SEM_INTERESSE = 'Não tenho interesse em continuar neste momento';
 
     const workshop = (function resolveWorkshop(){
       const param = new URLSearchParams(location.search).get('data') || '';
@@ -409,11 +410,11 @@
       progressText.hidden = true;
       form.hidden = true;
 
-      // Quem respondeu "quero entender os proximos passos" sai da pesquisa
-      // com o caminho aberto; para as outras respostas o botao nao aparece.
-      if(respostas.interesse_continuar === 'Quero entender os próximos passos'){
+      // Quem pediu algum proximo passo sai da pesquisa com o caminho aberto, e a
+      // mensagem ja diz qual passo foi; so o "nao tenho interesse" fica sem botao.
+      if(respostas.interesse_continuar && respostas.interesse_continuar !== SEM_INTERESSE){
         const link = document.getElementById('successWhatsApp');
-        const mensagem = `Olá! Sou ${respostas.nome} e participei do ${workshop.rotulo}. Quero entender os próximos passos com a VozUP.`;
+        const mensagem = `Olá! Sou ${respostas.nome} e participei do ${workshop.rotulo}. ${respostas.interesse_continuar}.`;
         link.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensagem)}`;
         link.style.display = 'inline-block';
         document.getElementById('successMessage').textContent = 'Sua resposta foi registrada. Fale com a nossa equipe para ver os próximos passos.';

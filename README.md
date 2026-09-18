@@ -13,11 +13,13 @@ formulários do grupo (`instituto-up-formulario`, `aula-experimental`).
    precisa desenvolver na sua comunicação? (`nota_contribuicao`, 0 a 10)
 2. **Qual momento do workshop mais contribuiu para a sua experiência?**
    (`momento_marcante`, 5 opções)
-3. **Depois da experiência de hoje, qual é o seu nível de interesse em continuar
-   desenvolvendo sua comunicação com a VozUP?** (`interesse_continuar`, 4 opções)
+3. **Qual será seu próximo passo com a VozUP?** (`interesse_continuar`,
+   4 opções: consultoria individual, plano ideal, "entrem em contato" e
+   *"Não tenho interesse em continuar neste momento"*)
 
-Quem responde *"Quero entender os próximos passos"* vê, na tela de obrigado, um
-botão que abre o WhatsApp da escola já com a mensagem escrita.
+Quem pede algum próximo passo — ou seja, qualquer resposta menos *"Não tenho
+interesse em continuar neste momento"* — vê, na tela de obrigado, um botão que
+abre o WhatsApp da escola já com a mensagem escrita, dizendo qual passo foi.
 
 ## Isto NÃO cadastra lead
 
@@ -79,7 +81,7 @@ SELECT payload->>'workshop_rotulo' AS workshop,
        COUNT(*)                                                   AS respostas,
        ROUND(AVG((payload->>'nota_contribuicao')::int), 1)        AS nota_media,
        COUNT(*) FILTER (
-         WHERE payload->>'interesse_continuar' = 'Quero entender os próximos passos'
+         WHERE payload->>'interesse_continuar' <> 'Não tenho interesse em continuar neste momento'
        )                                                          AS quer_proximos_passos
   FROM inscricoes.avaliacoes_workshop
  GROUP BY 1

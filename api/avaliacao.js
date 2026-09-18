@@ -37,16 +37,16 @@ const MAX_BODY_BYTES = 16 * 1024;
 // a pagina e publica e o POST pode vir de qualquer lugar, entao a lista que
 // vale e esta. Ao mudar uma pergunta na tela, mude aqui no mesmo commit.
 const MOMENTOS = [
-  'Storytelling',
+  'Storytelling (a forma estratégica para gerar conexão)',
   'Dinâmica: apresentar e “vender” o colega',
   'Dinâmica: “Quem sou eu?”',
   'Visualização de futuro',
   'O conjunto da experiência',
 ];
 const INTERESSES = [
-  'Quero entender os próximos passos',
-  'Tenho interesse, mas preciso avaliar',
-  'Gostei da experiência, mas não é prioridade agora',
+  'Quero agendar minha consultoria individual para conhecer a grade de cursos',
+  'Quero continuar desenvolvendo minha comunicação e entender o plano ideal para mim',
+  'Gostei da experiência e quero que entrem em contato para me explicar as opções',
   'Não tenho interesse em continuar neste momento',
 ];
 
